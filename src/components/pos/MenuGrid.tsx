@@ -1,4 +1,5 @@
 import { MenuItem } from '@/types/pos';
+import { formatCurrency } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 
 interface MenuGridProps {
@@ -29,7 +30,7 @@ export const MenuGrid = ({ items, onAddItem }: MenuGridProps) => {
             </p>
           )}
           <p className="text-lg font-bold text-primary mt-2">
-            ${item.price.toFixed(2)}
+            {formatCurrency(item.price)}
           </p>
         </button>
       ))}

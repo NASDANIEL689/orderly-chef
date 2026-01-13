@@ -97,29 +97,25 @@ FOR EACH ROW
 WHEN (NEW.order_number IS NULL OR NEW.order_number = '')
 EXECUTE FUNCTION public.generate_order_number();
 
--- Insert sample categories
+-- Insert sample categories (pizza shop only)
 INSERT INTO public.categories (name, icon) VALUES
-  ('Burgers', 'burger'),
   ('Pizza', 'pizza'),
-  ('Drinks', 'coffee'),
-  ('Sides', 'fries'),
-  ('Desserts', 'cake');
+  ('Drinks', 'cup');
 
--- Insert sample menu items
+-- Insert sample menu items (pizzas and drinks only)
 INSERT INTO public.menu_items (category_id, name, price, description) VALUES
-  ((SELECT id FROM public.categories WHERE name = 'Burgers'), 'Classic Burger', 8.99, 'Beef patty with lettuce, tomato, onion'),
-  ((SELECT id FROM public.categories WHERE name = 'Burgers'), 'Cheese Burger', 9.99, 'Classic with melted cheddar'),
-  ((SELECT id FROM public.categories WHERE name = 'Burgers'), 'Bacon Burger', 11.99, 'With crispy bacon strips'),
-  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Margherita', 12.99, 'Tomato, mozzarella, basil'),
-  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Pepperoni', 14.99, 'Classic pepperoni pizza'),
-  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Hawaiian', 14.99, 'Ham and pineapple'),
-  ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Cola', 2.49, 'Classic cola drink'),
+  -- Kasi Special combos (choose any flavour: Meat Lovers, Mexican Chilli, Creamy Chicken, Phane Pizza)
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: One Large + Double Mini Decker', 220.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: One Large + Triple Mini Decker', 250.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: One Large + Quad Mini Decker', 280.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: Two Large + Single Mini Decker', 280.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: Two Large + Double Mini Decker', 300.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: Two Large + Triple Mini Decker', 350.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Pizza'), 'Kasi Special: Two Large + Quad Mini Decker', 380.00, 'Pick flavour: Meat Lovers / Mexican Chilli / Creamy Chicken / Phane Pizza'),
+  ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Cola', 2.49, 'Classic cola'),
   ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Lemonade', 2.99, 'Fresh squeezed lemonade'),
-  ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Coffee', 3.49, 'Hot brewed coffee'),
-  ((SELECT id FROM public.categories WHERE name = 'Sides'), 'French Fries', 3.99, 'Crispy golden fries'),
-  ((SELECT id FROM public.categories WHERE name = 'Sides'), 'Onion Rings', 4.49, 'Battered onion rings'),
-  ((SELECT id FROM public.categories WHERE name = 'Desserts'), 'Ice Cream', 4.99, 'Vanilla ice cream'),
-  ((SELECT id FROM public.categories WHERE name = 'Desserts'), 'Brownie', 5.49, 'Chocolate brownie');
+  ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Iced Tea', 2.99, 'Brewed tea over ice'),
+  ((SELECT id FROM public.categories WHERE name = 'Drinks'), 'Sparkling Water', 2.79, 'Lightly carbonated mineral water');
 
 -- Enable realtime for orders table
 ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;

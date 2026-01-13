@@ -25,13 +25,16 @@ const Index = () => {
   const createOrder = useCreateOrder();
   const updateOrderStatus = useUpdateOrderStatus();
 
+  const flavourOptions = ['Meat Lovers', 'Mexican Chilli', 'Creamy Chicken', 'Phane Pizza'] as const;
+
   const addToCart = (item: MenuItem) => {
     setCart((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
         return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i));
       }
-      return [...prev, { ...item, quantity: 1 }];
+      // Default flavour so checkout always has a selection
+      return [...prev, { ...item, quantity: 1, flavour: flavourOptions[0] }];
     });
     toast.success(`${item.name} added to cart`);
   };
@@ -42,6 +45,10 @@ const Index = () => {
     } else {
       setCart((prev) => prev.map((i) => (i.id === itemId ? { ...i, quantity } : i)));
     }
+  };
+
+  const updateFlavour = (itemId: string, flavour: string) => {
+    setCart((prev) => prev.map((i) => (i.id === itemId ? { ...i, flavour } : i)));
   };
 
   const removeItem = (itemId: string) => {
@@ -149,9 +156,11 @@ const Index = () => {
           <CartPanel
             items={cart}
             onUpdateQuantity={updateQuantity}
+            onUpdateFlavour={updateFlavour}
             onRemoveItem={removeItem}
             onClearCart={clearCart}
             onCheckout={() => setIsPaymentOpen(true)}
+            flavourOptions={flavourOptions as unknown as string[]}
           />
         </div>
       </div>

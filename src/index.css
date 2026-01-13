@@ -4,91 +4,96 @@
 @tailwind components;
 @tailwind utilities;
 
-/* POS System Design System - Modern Dark Theme */
+/* POS System Design System - Pizza-Themed Warm Dark Palette */
 
 @layer base {
   :root {
-    --background: 220 20% 10%;
-    --foreground: 210 40% 98%;
+    --background: 0 0% 100%;
+    --foreground: 24 18% 12%;
 
-    --card: 220 20% 14%;
-    --card-foreground: 210 40% 98%;
+    --card: 45 25% 98%;
+    --card-foreground: 24 18% 12%;
 
-    --popover: 220 20% 12%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 45 25% 98%;
+    --popover-foreground: 24 18% 12%;
 
-    --primary: 160 84% 39%;
-    --primary-foreground: 220 20% 10%;
+    /* Tomato red for primary actions */
+    --primary: 8 74% 52%;
+    --primary-foreground: 43 92% 96%;
 
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 40% 98%;
+    /* Toasted crust browns for surfaces */
+    --secondary: 35 30% 92%;
+    --secondary-foreground: 24 18% 18%;
 
-    --muted: 220 20% 20%;
-    --muted-foreground: 215 20% 55%;
+    /* Warm neutrals for muted states */
+    --muted: 35 18% 90%;
+    --muted-foreground: 30 12% 46%;
 
-    --accent: 160 84% 39%;
-    --accent-foreground: 220 20% 10%;
+    /* Cheese gold accent */
+    --accent: 42 92% 56%;
+    --accent-foreground: 24 60% 12%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
 
-    --success: 142 76% 36%;
+    /* Basil green for success */
+    --success: 128 45% 45%;
     --success-foreground: 210 40% 98%;
 
-    --warning: 38 92% 50%;
-    --warning-foreground: 220 20% 10%;
+    --warning: 42 92% 56%;
+    --warning-foreground: 18 24% 12%;
 
-    --border: 220 20% 22%;
-    --input: 220 20% 18%;
-    --ring: 160 84% 39%;
+    --border: 35 20% 86%;
+    --input: 35 22% 92%;
+    --ring: 8 74% 52%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 220 20% 12%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 20% 22%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-background: 45 25% 98%;
+    --sidebar-foreground: 24 18% 12%;
+    --sidebar-primary: 8 74% 52%;
+    --sidebar-primary-foreground: 43 92% 96%;
+    --sidebar-accent: 35 30% 92%;
+    --sidebar-accent-foreground: 24 18% 18%;
+    --sidebar-border: 35 20% 86%;
+    --sidebar-ring: 8 74% 52%;
 
-    --gradient-primary: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(172 66% 50%) 100%);
-    --gradient-secondary: linear-gradient(135deg, hsl(220 20% 18%) 0%, hsl(220 20% 24%) 100%);
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%) 0%, hsl(160 84% 39%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(8 74% 52%) 0%, hsl(42 92% 56%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(35 30% 92%) 0%, hsl(35 18% 90%) 100%);
+    --gradient-success: linear-gradient(135deg, hsl(128 45% 45%) 0%, hsl(42 92% 56%) 100%);
     
-    --shadow-glow: 0 0 20px hsl(160 84% 39% / 0.3);
-    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.4);
+    --shadow-glow: 0 0 20px hsl(42 92% 56% / 0.35);
+    --shadow-card: 0 4px 18px hsl(0 0% 0% / 0.12);
   }
 
   .dark {
-    --background: 220 20% 10%;
-    --foreground: 210 40% 98%;
-    --card: 220 20% 14%;
-    --card-foreground: 210 40% 98%;
-    --popover: 220 20% 12%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 160 84% 39%;
-    --primary-foreground: 220 20% 10%;
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 220 20% 20%;
-    --muted-foreground: 215 20% 55%;
-    --accent: 160 84% 39%;
-    --accent-foreground: 220 20% 10%;
+    --background: 0 0% 100%;
+    --foreground: 24 18% 12%;
+    --card: 45 25% 98%;
+    --card-foreground: 24 18% 12%;
+    --popover: 45 25% 98%;
+    --popover-foreground: 24 18% 12%;
+    --primary: 8 74% 52%;
+    --primary-foreground: 43 92% 96%;
+    --secondary: 35 30% 92%;
+    --secondary-foreground: 24 18% 18%;
+    --muted: 35 18% 90%;
+    --muted-foreground: 30 12% 46%;
+    --accent: 42 92% 56%;
+    --accent-foreground: 24 60% 12%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 20% 22%;
-    --input: 220 20% 18%;
-    --ring: 160 84% 39%;
-    --sidebar-background: 220 20% 12%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 160 84% 39%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 220 20% 18%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 20% 22%;
-    --sidebar-ring: 160 84% 39%;
+    --border: 35 20% 86%;
+    --input: 35 22% 92%;
+    --ring: 8 74% 52%;
+    --sidebar-background: 45 25% 98%;
+    --sidebar-foreground: 24 18% 12%;
+    --sidebar-primary: 8 74% 52%;
+    --sidebar-primary-foreground: 43 92% 96%;
+    --sidebar-accent: 35 30% 92%;
+    --sidebar-accent-foreground: 24 18% 18%;
+    --sidebar-border: 35 20% 86%;
+    --sidebar-ring: 8 74% 52%;
   }
 }
 

@@ -66,15 +66,20 @@ export const useCreateOrder = () => {
       if (orderError) throw orderError;
 
       // Create order items
-      const orderItems = orderData.items.map((item) => ({
-        order_id: order.id,
-        menu_item_id: item.id,
-        item_name: item.name,
-        quantity: item.quantity,
-        unit_price: item.price,
-        total_price: item.price * item.quantity,
-        notes: item.notes || null,
-      }));
+      const orderItems = orderData.items.map((item) => {
+        const combinedNotes = [item.flavour ? `Flavour: ${item.flavour}` : '', item.notes || '']
+          .filter(Boolean)
+          .join(' | ');
+        return {
+          order_id: order.id,
+          menu_item_id: item.id,
+          item_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total_price: item.price * item.quantity,
+          notes: combinedNotes || null,
+        };
+      });
 
       const { error: itemsError } = await supabase
         .from('order_items')

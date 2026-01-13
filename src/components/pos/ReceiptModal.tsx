@@ -1,6 +1,7 @@
 import { Order, OrderItem } from '@/types/pos';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Printer, Mail, X } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface ReceiptModalProps {
   isOpen: boolean;
@@ -48,7 +49,7 @@ export const ReceiptModal = ({ isOpen, onClose, order, items, onPrint, onEmail }
                   <span>
                     {item.quantity}x {item.item_name}
                   </span>
-                  <span>${item.total_price.toFixed(2)}</span>
+                  <span>{formatCurrency(item.total_price)}</span>
                 </div>
               ))}
             </div>
@@ -58,15 +59,15 @@ export const ReceiptModal = ({ isOpen, onClose, order, items, onPrint, onEmail }
             <div className="space-y-1 text-xs">
               <div className="flex justify-between">
                 <span>Subtotal:</span>
-                <span>${order.subtotal.toFixed(2)}</span>
+                <span>{formatCurrency(order.subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax (10%):</span>
-                <span>${order.tax.toFixed(2)}</span>
+                <span>{formatCurrency(order.tax)}</span>
               </div>
               <div className="flex justify-between font-bold text-sm pt-1">
                 <span>TOTAL:</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>{formatCurrency(order.total)}</span>
               </div>
             </div>
 
@@ -76,11 +77,11 @@ export const ReceiptModal = ({ isOpen, onClose, order, items, onPrint, onEmail }
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
                     <span>Cash Received:</span>
-                    <span>${order.amount_paid.toFixed(2)}</span>
+                    <span>{formatCurrency(order.amount_paid)}</span>
                   </div>
                   <div className="flex justify-between font-bold">
                     <span>Change:</span>
-                    <span>${order.change_amount?.toFixed(2)}</span>
+                    <span>{formatCurrency(order.change_amount || 0)}</span>
                   </div>
                 </div>
               </>

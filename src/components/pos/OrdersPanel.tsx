@@ -1,6 +1,7 @@
 import { Order } from '@/types/pos';
 import { Clock, CheckCircle, ChefHat, Package, XCircle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { formatCurrency } from '@/lib/utils';
 
 interface OrdersPanelProps {
   orders: Order[];
@@ -55,7 +56,7 @@ export const OrdersPanel = ({ orders, onUpdateStatus }: OrdersPanelProps) => {
                 )}
 
                 <div className="flex justify-between items-center pt-3 border-t border-border">
-                  <span className="font-bold text-primary">${order.total.toFixed(2)}</span>
+                  <span className="font-bold text-primary">{formatCurrency(order.total)}</span>
                   {config.next && (
                     <button
                       onClick={() => onUpdateStatus(order.id, config.next!)}

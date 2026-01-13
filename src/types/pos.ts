@@ -49,4 +49,5 @@ export interface Order {
 export interface CartItem extends MenuItem {
   quantity: number;
   notes?: string;
+  flavour?: string;
 }

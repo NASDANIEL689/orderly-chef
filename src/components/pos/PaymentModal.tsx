@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { CreditCard, Banknote, Globe, Mail, Printer, X, Check } from 'lucide-react';
+import { formatCurrency } from '@/lib/utils';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -157,7 +158,7 @@ export const PaymentModal = ({ isOpen, onClose, items, onCompleteOrder }: Paymen
                         onClick={() => setAmountPaid(amount.toString())}
                         className="flex-1 py-2 px-4 rounded-lg bg-secondary text-foreground font-medium hover:bg-muted transition-all"
                       >
-                        ${amount}
+                        {formatCurrency(amount)}
                       </button>
                     ))}
                     <button
@@ -168,7 +169,7 @@ export const PaymentModal = ({ isOpen, onClose, items, onCompleteOrder }: Paymen
                     </button>
                   </div>
                   <div className="pos-input text-3xl font-mono text-center py-4">
-                    ${amountPaid || '0.00'}
+                    {formatCurrency(Number(amountPaid || '0'))}
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map((key) => (
@@ -220,31 +221,36 @@ export const PaymentModal = ({ isOpen, onClose, items, onCompleteOrder }: Paymen
             <div className="space-y-2 mb-4 max-h-48 overflow-y-auto">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {item.quantity}x {item.name}
-                  </span>
-                  <span className="text-foreground">${(item.price * item.quantity).toFixed(2)}</span>
+                  <div className="text-muted-foreground">
+                    <div>
+                      {item.quantity}x {item.name}
+                    </div>
+                    {item.flavour && (
+                      <div className="text-xs text-foreground">Flavour: {item.flavour}</div>
+                    )}
+                  </div>
+                  <span className="text-foreground">{formatCurrency(item.price * item.quantity)}</span>
                 </div>
               ))}
             </div>
             <div className="border-t border-border pt-4 space-y-2">
               <div className="flex justify-between text-muted-foreground">
                 <span>Subtotal</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between text-muted-foreground">
                 <span>Tax (10%)</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>{formatCurrency(tax)}</span>
               </div>
               <div className="flex justify-between text-xl font-bold text-foreground pt-2 border-t border-border">
                 <span>Total</span>
-                <span className="text-primary">${total.toFixed(2)}</span>
+                <span className="text-primary">{formatCurrency(total)}</span>
               </div>
               {paymentMethod === 'cash' && parseFloat(amountPaid) > 0 && (
                 <div className="flex justify-between text-xl font-bold pt-2 border-t border-border">
                   <span className="text-foreground">Change</span>
                   <span className={change >= 0 ? 'text-success' : 'text-destructive'}>
-                    ${change >= 0 ? change.toFixed(2) : '—'}
+                    {change >= 0 ? formatCurrency(change) : '—'}
                   </span>
                 </div>
               )}

@@ -1,21 +1,26 @@
 import { CartItem } from '@/types/pos';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/utils';
 
 interface CartPanelProps {
   items: CartItem[];
   onUpdateQuantity: (itemId: string, quantity: number) => void;
+  onUpdateFlavour: (itemId: string, flavour: string) => void;
   onRemoveItem: (itemId: string) => void;
   onClearCart: () => void;
   onCheckout: () => void;
+  flavourOptions: string[];
 }
 
 export const CartPanel = ({
   items,
   onUpdateQuantity,
+  onUpdateFlavour,
   onRemoveItem,
   onClearCart,
   onCheckout,
+  flavourOptions,
 }: CartPanelProps) => {
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.1;
@@ -51,9 +56,21 @@ export const CartPanel = ({
               <div key={item.id} className="order-item">
                 <div className="flex-1">
                   <p className="font-medium text-foreground">{item.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    ${item.price.toFixed(2)} each
-                  </p>
+                  <p className="text-sm text-muted-foreground">{formatCurrency(item.price)} each</p>
+                  <div className="mt-2">
+                    <label className="text-xs text-muted-foreground block mb-1">Flavour</label>
+                    <select
+                      value={item.flavour || flavourOptions[0]}
+                      onChange={(e) => onUpdateFlavour(item.id, e.target.value)}
+                      className="w-full bg-input border border-border rounded-md px-2 py-1 text-foreground text-sm"
+                    >
+                      {flavourOptions.map((flavour) => (
+                        <option key={flavour} value={flavour}>
+                          {flavour}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
@@ -86,15 +103,15 @@ export const CartPanel = ({
       <div className="p-4 border-t border-border space-y-2">
         <div className="flex justify-between text-muted-foreground">
           <span>Subtotal</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>{formatCurrency(subtotal)}</span>
         </div>
         <div className="flex justify-between text-muted-foreground">
           <span>Tax (10%)</span>
-          <span>${tax.toFixed(2)}</span>
+          <span>{formatCurrency(tax)}</span>
         </div>
         <div className="flex justify-between text-xl font-bold text-foreground pt-2 border-t border-border">
           <span>Total</span>
-          <span className="text-primary">${total.toFixed(2)}</span>
+          <span className="text-primary">{formatCurrency(total)}</span>
         </div>
       </div>
 
@@ -103,7 +120,7 @@ export const CartPanel = ({
         <button
           onClick={onCheckout}
           disabled={items.length === 0}
-          className="pos-button-primary w-full text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="pos-button-primary w-full text-base leading-tight whitespace-normal disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Proceed to Payment
         </button>
