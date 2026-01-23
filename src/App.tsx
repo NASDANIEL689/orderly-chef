@@ -45,7 +45,7 @@ const App = () => {
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
             <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
             <Route path="/" element={session ? <Index session={session} /> : <Navigate to="/login" />} />
