@@ -3,6 +3,38 @@ import { supabase } from '@/integrations/supabase/client';
 import { Order, CartItem } from '@/types/pos';
 import { toast } from 'sonner';
 
+const ORDER_COUNTER_KEY = 'order_counter';
+const ORDER_COUNTER_START_KEY = 'order_counter_start';
+const TWO_DAYS_MS = 2 * 24 * 60 * 60 * 1000;
+
+const getNextOrderNumber = () => {
+  try {
+    const now = Date.now();
+    const start = parseInt(localStorage.getItem(ORDER_COUNTER_START_KEY) || '0', 10);
+    const counter = parseInt(localStorage.getItem(ORDER_COUNTER_KEY) || '0', 10);
+
+    // Reset counter if no start or more than 2 days passed
+    if (!start || now - start > TWO_DAYS_MS) {
+      localStorage.setItem(ORDER_COUNTER_START_KEY, now.toString());
+      localStorage.setItem(ORDER_COUNTER_KEY, '1');
+      return '00001';
+    }
+
+    const next = counter + 1;
+    localStorage.setItem(ORDER_COUNTER_KEY, next.toString());
+    return next.toString().padStart(5, '0');
+  } catch (err) {
+    console.error('Failed to generate order number, using fallback:', err);
+    // Fallback: random 5-digit
+    return (Math.floor(10000 + Math.random() * 90000)).toString();
+  }
+};
+
+const isValidUUID = (value: string | null | undefined) => {
+  if (!value) return false;
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+};
+
 interface CreateOrderData {
   items: CartItem[];
   orderType: 'dine-in' | 'takeaway' | 'online';
@@ -20,12 +52,16 @@ export const useOrders = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('orders')
-        .select('*')
+        .select('*, order_items(*)')
         .order('created_at', { ascending: false })
         .limit(50);
       
       if (error) throw error;
-      return data as Order[];
+      // Map Supabase relation order_items -> items for UI convenience
+      return (data || []).map((row: any) => ({
+        ...row,
+        items: row.order_items || [],
+      })) as Order[];
     },
   });
 };
@@ -42,12 +78,13 @@ export const useCreateOrder = () => {
       const tax = subtotal * 0.1; // 10% tax
       const total = subtotal + tax;
       const changeAmount = orderData.amountPaid ? orderData.amountPaid - total : null;
+      const orderNumber = getNextOrderNumber();
 
       // Create order
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .insert({
-          order_number: `ORD-${Date.now()}`,
+          order_number: orderNumber,
           order_type: orderData.orderType,
           customer_name: orderData.customerName || null,
           customer_email: orderData.customerEmail || null,
@@ -72,7 +109,8 @@ export const useCreateOrder = () => {
           .join(' | ');
         return {
           order_id: order.id,
-          menu_item_id: item.id,
+          // fallback menu items use local UUID-less ids; store null to satisfy UUID constraint
+          menu_item_id: isValidUUID(item.id) ? item.id : null,
           item_name: item.name,
           quantity: item.quantity,
           unit_price: item.price,

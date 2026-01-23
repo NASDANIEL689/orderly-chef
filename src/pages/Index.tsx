@@ -1,23 +1,28 @@
 import { useState } from 'react';
+import type { Session } from '@supabase/supabase-js';
 import { useCategories, useMenuItems } from '@/hooks/useMenu';
 import { useOrders, useCreateOrder, useUpdateOrderStatus } from '@/hooks/useOrders';
+import { useStaffRole } from '@/hooks/useStaffRole';
 import { CategoryTabs } from '@/components/pos/CategoryTabs';
 import { MenuGrid } from '@/components/pos/MenuGrid';
 import { CartPanel } from '@/components/pos/CartPanel';
 import { PaymentModal } from '@/components/pos/PaymentModal';
 import { OrdersPanel } from '@/components/pos/OrdersPanel';
 import { ReceiptModal } from '@/components/pos/ReceiptModal';
-import { CartItem, MenuItem, Order } from '@/types/pos';
+import { CartItem, MenuItem, Order, OrderItem } from '@/types/pos';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ShoppingCart, ClipboardList, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
 
-const Index = () => {
+const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; userEmail?: string | null }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
+  const [receiptItems, setReceiptItems] = useState<OrderItem[]>([]);
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { data: menuItems = [], isLoading: itemsLoading } = useMenuItems(selectedCategory || undefined);
@@ -76,6 +81,17 @@ const Index = () => {
         amountPaid: data.amountPaid,
       });
       setCompletedOrder(order);
+      setReceiptItems(
+        cart.map((item) => ({
+          id: item.id,
+          menu_item_id: item.id,
+          item_name: item.name,
+          quantity: item.quantity,
+          unit_price: item.price,
+          total_price: item.price * item.quantity,
+          notes: item.notes || null,
+        }))
+      );
       setIsPaymentOpen(false);
       setIsReceiptOpen(true);
       setCart([]);
@@ -95,6 +111,10 @@ const Index = () => {
 
   const isLoading = categoriesLoading || itemsLoading;
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -107,6 +127,10 @@ const Index = () => {
             <span className="text-sm text-muted-foreground">
               {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
+            <span className="text-xs text-muted-foreground">{userEmail}</span>
+            <Button variant="secondary" size="sm" onClick={handleSignOut}>
+              Sign out
+            </Button>
           </div>
         </div>
       </header>
@@ -146,6 +170,12 @@ const Index = () => {
               <OrdersPanel
                 orders={orders}
                 onUpdateStatus={(orderId, status) => updateOrderStatus.mutate({ orderId, status })}
+                canUpdateStatus={canUpdateStatus}
+                onReprintReceipt={(order) => {
+                  setCompletedOrder(order);
+                  setReceiptItems(order.items || []);
+                  setIsReceiptOpen(true);
+                }}
               />
             </TabsContent>
           </Tabs>
@@ -177,19 +207,44 @@ const Index = () => {
         isOpen={isReceiptOpen}
         onClose={() => setIsReceiptOpen(false)}
         order={completedOrder}
-        items={cart.map((item) => ({
-          id: item.id,
-          menu_item_id: item.id,
-          item_name: item.name,
-          quantity: item.quantity,
-          unit_price: item.price,
-          total_price: item.price * item.quantity,
-          notes: null,
-        }))}
+        items={receiptItems}
         onPrint={handlePrint}
         onEmail={handleEmail}
       />
     </div>
+  );
+};
+
+const Index = ({ session }: { session: Session }) => {
+  const { data: staffRole, isLoading } = useStaffRole(session.user.id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!staffRole) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-center px-6">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Staff Access Required</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Your account is not listed as staff. Ask an admin to add you.
+        </p>
+        <Button variant="secondary" onClick={() => supabase.auth.signOut()}>
+          Sign out
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <PosScreen
+      canUpdateStatus={staffRole === 'admin'}
+      userEmail={session.user.email}
+    />
   );
 };
 
