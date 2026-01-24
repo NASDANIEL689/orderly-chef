@@ -5,10 +5,11 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: process.env.VITE_BASE_URL || "/orderly-chef/",
+  base: "/orderly-chef/",
   build: {
     outDir: "dist",
     sourcemap: false,
+    emptyOutDir: true,
   },
   server: {
     host: "::",
