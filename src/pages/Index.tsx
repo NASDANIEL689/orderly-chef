@@ -15,6 +15,16 @@ import { ShoppingCart, ClipboardList, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
 const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; userEmail?: string | null }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -23,6 +33,11 @@ const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; u
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [completedOrder, setCompletedOrder] = useState<Order | null>(null);
   const [receiptItems, setReceiptItems] = useState<OrderItem[]>([]);
+  const [isCreateUserOpen, setIsCreateUserOpen] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserRole, setNewUserRole] = useState<'staff' | 'admin'>('staff');
+  const [isCreatingUser, setIsCreatingUser] = useState(false);
 
   const { data: categories = [], isLoading: categoriesLoading } = useCategories();
   const { data: menuItems = [], isLoading: itemsLoading } = useMenuItems(selectedCategory || undefined);
@@ -115,6 +130,34 @@ const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; u
     await supabase.auth.signOut();
   };
 
+  const handleCreateUser = async () => {
+    if (!newUserEmail || !newUserPassword) {
+      toast.error('Email and password are required.');
+      return;
+    }
+
+    setIsCreatingUser(true);
+    const { data, error } = await supabase.functions.invoke('create-user', {
+      body: {
+        email: newUserEmail,
+        password: newUserPassword,
+        role: newUserRole,
+      },
+    });
+
+    if (error) {
+      console.error('Create user error:', error);
+      toast.error(error.message || 'Failed to create user.');
+    } else {
+      toast.success(`Created ${data?.email || 'user'} (${data?.role || newUserRole}).`);
+      setNewUserEmail('');
+      setNewUserPassword('');
+      setNewUserRole('staff');
+      setIsCreateUserOpen(false);
+    }
+    setIsCreatingUser(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -128,6 +171,11 @@ const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; u
               {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
             </span>
             <span className="text-xs text-muted-foreground">{userEmail}</span>
+            {canUpdateStatus && (
+              <Button variant="outline" size="sm" onClick={() => setIsCreateUserOpen(true)}>
+                Create user
+              </Button>
+            )}
             <Button variant="secondary" size="sm" onClick={handleSignOut}>
               Sign out
             </Button>
@@ -211,6 +259,59 @@ const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; u
         onPrint={handlePrint}
         onEmail={handleEmail}
       />
+
+      <Dialog open={isCreateUserOpen} onOpenChange={setIsCreateUserOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create POS User</DialogTitle>
+            <DialogDescription>
+              Admins can add staff accounts for POS access.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="new-user-email">Email</Label>
+              <Input
+                id="new-user-email"
+                type="email"
+                value={newUserEmail}
+                onChange={(event) => setNewUserEmail(event.target.value)}
+                placeholder="staff@example.com"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-user-password">Password</Label>
+              <Input
+                id="new-user-password"
+                type="password"
+                value={newUserPassword}
+                onChange={(event) => setNewUserPassword(event.target.value)}
+                placeholder="Set a strong password"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="new-user-role">Role</Label>
+              <select
+                id="new-user-role"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={newUserRole}
+                onChange={(event) => setNewUserRole(event.target.value === 'admin' ? 'admin' : 'staff')}
+              >
+                <option value="staff">Staff</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsCreateUserOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreateUser} disabled={isCreatingUser}>
+              {isCreatingUser ? 'Creating...' : 'Create user'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
