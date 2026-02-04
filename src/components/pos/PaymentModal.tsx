@@ -50,6 +50,14 @@ export const PaymentModal = ({ isOpen, onClose, items, onCompleteOrder }: Paymen
     }
   };
 
+  const handleAmountInput = (value: string) => {
+    const normalized = value.replace(/[^0-9.]/g, '');
+    const parts = normalized.split('.');
+    if (parts.length > 2) return;
+    const cleaned = parts.length === 2 ? `${parts[0]}.${parts[1].slice(0, 2)}` : normalized;
+    setAmountPaid(cleaned);
+  };
+
   const handleComplete = () => {
     onCompleteOrder({
       paymentMethod,
@@ -168,8 +176,16 @@ export const PaymentModal = ({ isOpen, onClose, items, onCompleteOrder }: Paymen
                       Exact
                     </button>
                   </div>
-                  <div className="pos-input text-3xl font-mono text-center py-4">
-                    {formatCurrency(Number(amountPaid || '0'))}
+                  <div className="space-y-2">
+                    <Label className="text-foreground">Enter Amount</Label>
+                    <Input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0.00"
+                      value={amountPaid}
+                      onChange={(event) => handleAmountInput(event.target.value)}
+                      className="pos-input text-2xl font-mono text-center"
+                    />
                   </div>
                   <div className="grid grid-cols-3 gap-2">
                     {['1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '0', '⌫'].map((key) => (
