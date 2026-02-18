@@ -184,9 +184,96 @@ export type Database = {
         }
         Relationships: []
       }
+      specials: {
+        Row: {
+          id: string
+          menu_item_id: string
+          discount_type: string
+          discount_value: number
+          start_date: string
+          end_date: string
+          description: string | null
+          is_active: boolean
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          menu_item_id: string
+          discount_type: string
+          discount_value: number
+          start_date: string
+          end_date: string
+          description?: string | null
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          menu_item_id?: string
+          discount_type?: string
+          discount_value?: number
+          start_date?: string
+          end_date?: string
+          description?: string | null
+          is_active?: boolean
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "specials_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "specials_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
-      [_ in never]: never
+      order_analytics: {
+        Row: {
+          id: string | null
+          created_at: string | null
+          order_date: string | null
+          order_week: string | null
+          order_month: string | null
+          subtotal: number | null
+          tax: number | null
+          total: number | null
+          amount_paid: number | null
+          status: string | null
+          payment_method: string | null
+          profit: number | null
+        }
+      }
+      daily_analytics: {
+        Row: {
+          order_date: string | null
+          total_orders: number | null
+          completed_orders: number | null
+          cancelled_orders: number | null
+          total_subtotal: number | null
+          total_tax: number | null
+          total_revenue: number | null
+          total_profit: number | null
+          avg_profit_per_order: number | null
+          highest_order_profit: number | null
+          lowest_order_profit: number | null
+        }
+      }
     }
     Functions: {
       [_ in never]: never

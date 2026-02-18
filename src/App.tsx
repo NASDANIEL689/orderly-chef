@@ -6,11 +6,32 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import Index from "./pages/Index";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import { supabase } from "@/integrations/supabase/client";
+import { useStaffRole } from "@/hooks/useStaffRole";
 
 const queryClient = new QueryClient();
+
+// Protected admin route component
+const AdminRoute = ({ session }: { session: Session }) => {
+  const { data: staffRole, isLoading } = useStaffRole(session.user.id);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+        Loading...
+      </div>
+    );
+  }
+
+  if (staffRole !== 'admin') {
+    return <Navigate to="/" />;
+  }
+
+  return <Admin session={session} />;
+};
 
 const App = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -49,6 +70,7 @@ const App = () => {
           <Routes>
             <Route path="/login" element={session ? <Navigate to="/" /> : <Login />} />
             <Route path="/" element={session ? <Index session={session} /> : <Navigate to="/login" />} />
+            <Route path="/admin" element={session ? <AdminRoute session={session} /> : <Navigate to="/login" />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

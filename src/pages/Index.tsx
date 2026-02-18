@@ -11,10 +11,11 @@ import { OrdersPanel } from '@/components/pos/OrdersPanel';
 import { ReceiptModal } from '@/components/pos/ReceiptModal';
 import { CartItem, MenuItem, Order, OrderItem } from '@/types/pos';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ShoppingCart, ClipboardList, Loader2 } from 'lucide-react';
+import { ShoppingCart, ClipboardList, Loader2, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; userEmail?: string | null }) => {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -172,9 +174,20 @@ const PosScreen = ({ canUpdateStatus, userEmail }: { canUpdateStatus: boolean; u
             </span>
             <span className="text-xs text-muted-foreground">{userEmail}</span>
             {canUpdateStatus && (
-              <Button variant="outline" size="sm" onClick={() => setIsCreateUserOpen(true)}>
-                Create user
-              </Button>
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate('/admin')}
+                  className="gap-2"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  Admin
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setIsCreateUserOpen(true)}>
+                  Create user
+                </Button>
+              </>
             )}
             <Button variant="secondary" size="sm" onClick={handleSignOut}>
               Sign out
